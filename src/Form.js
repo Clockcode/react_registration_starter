@@ -38,9 +38,9 @@ class Form extends Component {
   render() {
     const { email, username, password, passwordCheck } = this.state;
     return (
-      <form className="mx-auto mt-4">
-        <div className="container">
-          <div className="row justify-content-center">
+      <div className="container">
+        <div className="row mt-4">
+          <form className="mx-auto">
             <h1 className="text-info">Form Page</h1>
             <div className="form-group">
               <label
@@ -108,9 +108,9 @@ class Form extends Component {
             >
               Submit
             </button>
-          </div>
+          </form>
         </div>
-      </form>
+      </div>
     );
   }
 }
