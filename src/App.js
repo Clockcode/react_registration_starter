@@ -1,26 +1,44 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Router } from "@reach/router";
+import "bootstrap/scss/bootstrap.scss";
+import firebase from "./Firebase";
+//Files
+import Navigation from "./Navigation";
+import Home from "./Home";
+import About from "./About";
+import Contact from "./Contact";
+import Form from "./Form";
+//Styles
+import "./App.scss";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      user: null,
+    };
+  }
+  //Whenever page reloads rriggers this method.
+  componentDidMount() {
+    let ref = firebase.database().ref("user");
+    ref.on("value", (snapshot) => {
+      let snapUser = snapshot.val();
+      this.setState({ user: snapUser });
+    });
+  }
+  render() {
+    return (
+      <>
+        <Navigation />
+        <Router>
+          <Home path="/" user={this.state.user} />
+          <About path="/about" />
+          <Contact path="/contact" />
+          <Form path="/form" />
+        </Router>
+      </>
+    );
+  }
 }
 
 export default App;
