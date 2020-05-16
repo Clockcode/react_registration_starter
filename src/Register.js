@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-
-class Form extends Component {
+import firebase from "./Firebase";
+class Register extends Component {
   constructor(props) {
     super(props);
 
@@ -9,38 +9,59 @@ class Form extends Component {
       username: "",
       password: "",
       passwordCheck: "",
+      errorMessage: null,
     };
+    this.handleChange = this.handleChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
   }
-  handleEmail = (event) => {
-    this.setState({
-      email: event.target.value,
-    });
+  handleChange = (event) => {
+    let itemName = event.target.name;
+    let itemValue = event.target.value;
+    this.setState(
+      {
+        [itemName]: itemValue,
+      },
+      () => {
+        this.state.password !== this.state.passwordCheck
+          ? this.setState({ errorMessage: "Passwords Don't match" })
+          : this.setState({ errorMessage: null });
+      }
+    );
   };
-  handleUsername = (event) => {
-    this.setState({
-      username: event.target.value,
-    });
-  };
-  handlePassword = (event) => {
-    this.setState({
-      password: event.target.value,
-    });
-  };
-  handlePasswordCheck = (event) => {
-    this.setState({
-      passwordCheck: event.target.value,
-    });
-  };
+
   handleSubmit = (event) => {
-    alert();
+    const submittedFormInfo = {
+      email: this.state.email,
+      username: this.state.username,
+      password: this.state.password,
+    };
+    event.preventDefault();
+    firebase
+      .auth()
+      .createUserWithEmailAndPassword(
+        submittedFormInfo.email,
+        submittedFormInfo.password
+      )
+      .then(this.props.registerUsername(submittedFormInfo.username))
+      .catch((error) => {
+        error.message
+          ? this.setState({ errorMessage: error.message })
+          : this.setState({ errorMessage: null });
+      });
   };
 
   render() {
-    const { email, username, password, passwordCheck } = this.state;
+    const {
+      email,
+      username,
+      password,
+      passwordCheck,
+      errorMessage,
+    } = this.state;
     return (
       <div className="container">
-        <div className="row mt-4">
-          <form className="mx-auto">
+        <div className="row mt-4 bg-gray-600">
+          <form className="mx-auto" onSubmit={this.handleSubmit}>
             <h1 className="text-info">Form Page</h1>
             <div className="form-group">
               <label
@@ -54,7 +75,8 @@ class Form extends Component {
                 type="email"
                 name="email"
                 value={email}
-                onChange={this.handleEmail}
+                required
+                onChange={this.handleChange}
               ></input>
             </div>
             <div className="form-group">
@@ -69,7 +91,8 @@ class Form extends Component {
                 type="text"
                 name="username"
                 value={username}
-                onChange={this.handleUsername}
+                required
+                onChange={this.handleChange}
               ></input>
             </div>
             <div className="form-group">
@@ -84,7 +107,8 @@ class Form extends Component {
                 type="password"
                 name="password"
                 value={password}
-                onChange={this.handlePassword}
+                required
+                onChange={this.handleChange}
               ></input>
             </div>
             <div className="form-group">
@@ -99,19 +123,18 @@ class Form extends Component {
                 type="password"
                 name="passwordCheck"
                 value={passwordCheck}
-                onChange={this.handlePasswordCheck}
+                required
+                onChange={this.handleChange}
               ></input>
             </div>
-            <button
-              onSubmit={this.handleSubmit}
-              className="btn btn-outline-info"
-            >
-              Submit
-            </button>
+            {errorMessage && (
+              <div className="alert-danger p-2 mb-4">{errorMessage}</div>
+            )}
+            <button className="btn btn-outline-info">Submit</button>
           </form>
         </div>
       </div>
     );
   }
 }
-export default Form;
+export default Register;
