@@ -19,6 +19,8 @@ class App extends React.Component {
       user: null,
       username: null,
       userID: null,
+      todos: "",
+      countTodos: null,
     };
   }
   //Whenever page reloads rriggers this method.
@@ -31,9 +33,25 @@ class App extends React.Component {
           username: user.displayName,
           userID: user.uid,
         });
+
+        const todoRef = firebase.database().ref("todo/" + user.uid);
+        todoRef.on("value", (snapshot) => {
+          const todos = snapshot.val();
+          const todoList = [];
+          for (let item in todos) {
+            todoList.push({
+              todoID: item,
+              todo: todos[item].todo,
+            });
+          }
+          this.setState({
+            todos: todoList,
+            countTodos: todoList.length,
+          });
+        });
       } else {
         // No user is signed in.
-        // console.info(`error while setting state inside didmount method`);
+        this.setState({ user: null });
       }
     });
   }
@@ -70,12 +88,22 @@ class App extends React.Component {
       }
     });
   };
+  addTodo = (todo) => {
+    console.info(`In the todo function biatchhh ${todo}`);
+    const ref = firebase.database().ref(`todo/${this.state.user.uid}`);
+    ref.push({ todo });
+  };
   render() {
     return (
       <>
         <Navigation logoutUser={this.logoutUser} user={this.state.user} />
         <Router>
-          <Home path="/" user={this.state.username} />
+          <Home
+            path="/"
+            user={this.state.username}
+            addTodo={this.addTodo}
+            todos={this.state.todos}
+          />
           <About path="/about" />
           <Contact path="/contact" />
           <Register path="/register" registerUsername={this.registerUsername} />

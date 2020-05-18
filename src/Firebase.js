@@ -4,7 +4,7 @@ import "firebase/analytics";
 import "firebase/auth";
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyACRoGUa_D3hpvjA6peNv8LFbeE-Dvq2BE",
+  apiKey: process.env.REACT_APP_FB_API,
   authDomain: "react-project-first-7050d.firebaseapp.com",
   databaseURL: "https://react-project-first-7050d.firebaseio.com",
   projectId: "react-project-first-7050d",
